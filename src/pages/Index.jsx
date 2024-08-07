@@ -9,6 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Label } from "@/components/ui/label";
 
 const catFacts = [
   "Cats sleep for about 70% of their lives.",
@@ -36,6 +39,8 @@ const Index = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
   const [catHappiness, setCatHappiness] = useState(50);
+  const [quizScore, setQuizScore] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const headerRef = useRef(null);
 
   const { scrollYProgress } = useScroll({
@@ -285,6 +290,37 @@ const Index = () => {
           <Button className="bg-pink-500 hover:bg-pink-600 text-white text-lg px-8 py-3">
             Explore More <ArrowRight className="ml-2" />
           </Button>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-white rounded-lg p-6 shadow-lg mb-8"
+        >
+          <h3 className="text-2xl font-bold mb-4 text-purple-700">Cat Trivia Quiz</h3>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-purple-500 hover:bg-purple-600 text-white">Start Quiz</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Question {currentQuestionIndex + 1}</DialogTitle>
+              </DialogHeader>
+              <div className="py-4">
+                <p className="mb-4">{catQuizQuestions[currentQuestionIndex].question}</p>
+                <RadioGroup onValueChange={(value) => handleQuizAnswer(value)}>
+                  {catQuizQuestions[currentQuestionIndex].options.map((option, index) => (
+                    <div key={index} className="flex items-center space-x-2">
+                      <RadioGroupItem value={option} id={`option-${index}`} />
+                      <Label htmlFor={`option-${index}`}>{option}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </div>
+            </DialogContent>
+          </Dialog>
+          <p className="mt-4">Your score: {quizScore} / {catQuizQuestions.length}</p>
         </motion.div>
       </main>
 
