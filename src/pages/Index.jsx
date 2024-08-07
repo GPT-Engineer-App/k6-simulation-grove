@@ -3,8 +3,10 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cat, Heart, Info, Paw, Star } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ArrowRight } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 
 const catFacts = [
   "Cats sleep for about 70% of their lives.",
@@ -12,20 +14,34 @@ const catFacts = [
   "Cats have over 20 vocalizations, including the purr.",
   "The first cat in space was French. She was named Felicette.",
   "Cats can jump up to six times their length.",
+  "A cat's hearing is much more sensitive than a human's or dog's.",
+  "Cats have a third eyelid called the 'haw' to protect their eyes.",
+  "A cat's sense of smell is 14 times stronger than a human's.",
+];
+
+const catBreeds = [
+  { name: "Siamese", description: "Known for their distinctive coloring and vocal nature" },
+  { name: "Persian", description: "Recognized for their long, luxurious coat and flat face" },
+  { name: "Maine Coon", description: "One of the largest domestic cat breeds with a friendly personality" },
+  { name: "Bengal", description: "Wild-looking cats with a spotted or marbled coat" },
+  { name: "British Shorthair", description: "Round-faced cats with a plush, dense coat" },
 ];
 
 const Index = () => {
   const [likeCount, setLikeCount] = useState(0);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentFactIndex((prevIndex) => (prevIndex + 1) % catFacts.length);
+      if (!isHovering) {
+        setCurrentFactIndex((prevIndex) => (prevIndex + 1) % catFacts.length);
+      }
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [isHovering]);
 
   const handleLike = () => {
     setLikeCount((prev) => prev + 1);
@@ -35,10 +51,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
-      <header className="bg-purple-600 text-white py-16 px-8 relative overflow-hidden">
+      <header className="bg-purple-600 text-white py-20 px-8 relative overflow-hidden">
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.h1 
-            className="text-6xl font-bold mb-4"
+            className="text-7xl font-bold mb-6"
             initial={{ opacity: 0, y: -50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -46,12 +62,12 @@ const Index = () => {
             Purrfect World of Cats
           </motion.h1>
           <motion.p 
-            className="text-xl"
+            className="text-2xl"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Discover the fascinating world of our feline friends
+            Embark on a whisker-twitching journey through the fascinating realm of our feline companions
           </motion.p>
         </div>
         <motion.div 
@@ -60,24 +76,32 @@ const Index = () => {
           animate={{ opacity: 0.1 }}
           transition={{ duration: 1 }}
         >
-          {[...Array(20)].map((_, i) => (
-            <Paw
+          {[...Array(30)].map((_, i) => (
+            <motion.div
               key={i}
-              className="text-white absolute"
-              style={{
+              className="absolute"
+              initial={{ 
+                top: `${Math.random() * 100}%`, 
+                left: `${Math.random() * 100}%`,
+                rotate: Math.random() * 360,
+                scale: Math.random() * 0.5 + 0.5
+              }}
+              animate={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
-                transform: `rotate(${Math.random() * 360}deg)`,
-                opacity: Math.random() * 0.5 + 0.5,
+                rotate: Math.random() * 360,
               }}
-            />
+              transition={{ duration: 20 + Math.random() * 10, repeat: Infinity, repeatType: "reverse" }}
+            >
+              <Paw className="text-white opacity-50" />
+            </motion.div>
           ))}
         </motion.div>
       </header>
       
       <main className="max-w-6xl mx-auto py-16 px-8">
         <motion.div 
-          className="relative mb-12"
+          className="relative mb-16"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
@@ -85,13 +109,15 @@ const Index = () => {
           <img 
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/Cat03.jpg/1200px-Cat03.jpg" 
             alt="Cute cat" 
-            className="mx-auto object-cover w-full h-[500px] rounded-lg shadow-lg"
+            className="mx-auto object-cover w-full h-[600px] rounded-lg shadow-2xl"
           />
           <motion.div 
-            className="absolute bottom-4 left-4 right-4 bg-black bg-opacity-50 text-white p-4 rounded"
+            className="absolute bottom-8 left-8 right-8 bg-black bg-opacity-70 text-white p-6 rounded-lg"
             initial={{ y: 50, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.5 }}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           >
             <AnimatePresence mode="wait">
               <motion.p
@@ -100,7 +126,7 @@ const Index = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.5 }}
-                className="text-lg font-semibold"
+                className="text-2xl font-semibold"
               >
                 {catFacts[currentFactIndex]}
               </motion.p>
@@ -108,82 +134,128 @@ const Index = () => {
           </motion.div>
         </motion.div>
         
-        <Tabs defaultValue="characteristics" className="mb-12">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="characteristics">Characteristics</TabsTrigger>
-            <TabsTrigger value="breeds">Popular Breeds</TabsTrigger>
+        <Tabs defaultValue="characteristics" className="mb-16">
+          <TabsList className="grid w-full grid-cols-2 mb-8">
+            <TabsTrigger value="characteristics" className="text-lg py-3">Characteristics</TabsTrigger>
+            <TabsTrigger value="breeds" className="text-lg py-3">Popular Breeds</TabsTrigger>
           </TabsList>
           <TabsContent value="characteristics">
-            <Card>
+            <Card className="border-4 border-purple-300">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Info className="mr-2" />
+                <CardTitle className="flex items-center text-3xl text-purple-700">
+                  <Info className="mr-3 h-8 w-8" />
                   Characteristics of Cats
                 </CardTitle>
-                <CardDescription>What makes cats unique?</CardDescription>
+                <CardDescription className="text-lg">What makes cats truly unique?</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Independent nature</li>
-                  <li>Excellent hunters with sharp claws and teeth</li>
-                  <li>Flexible bodies and quick reflexes</li>
-                  <li>Keen senses, especially hearing and night vision</li>
-                  <li>Communicate through vocalizations, body language, and scent</li>
+                <ul className="list-none pl-6 space-y-4">
+                  {[
+                    "Independent nature with a touch of affection",
+                    "Excellent hunters with razor-sharp claws and teeth",
+                    "Incredibly flexible bodies and lightning-quick reflexes",
+                    "Keen senses, especially their extraordinary hearing and night vision",
+                    "Masters of communication through vocalizations, body language, and scent marking"
+                  ].map((item, index) => (
+                    <motion.li 
+                      key={index}
+                      className="flex items-center text-lg"
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                    >
+                      <Paw className="mr-3 h-6 w-6 text-purple-500" />
+                      {item}
+                    </motion.li>
+                  ))}
                 </ul>
               </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="breeds">
-            <Card>
+            <Card className="border-4 border-pink-300">
               <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Cat className="mr-2" />
+                <CardTitle className="flex items-center text-3xl text-pink-700">
+                  <Cat className="mr-3 h-8 w-8" />
                   Popular Cat Breeds
                 </CardTitle>
-                <CardDescription>Some well-known cat breeds around the world</CardDescription>
+                <CardDescription className="text-lg">Discover some of the most beloved cat breeds worldwide</CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Siamese - Known for their distinctive coloring and vocal nature</li>
-                  <li>Persian - Recognized for their long, luxurious coat and flat face</li>
-                  <li>Maine Coon - One of the largest domestic cat breeds with a friendly personality</li>
-                  <li>Bengal - Wild-looking cats with a spotted or marbled coat</li>
-                  <li>British Shorthair - Round-faced cats with a plush, dense coat</li>
-                </ul>
+                <Carousel className="w-full max-w-xs mx-auto">
+                  <CarouselContent>
+                    {catBreeds.map((breed, index) => (
+                      <CarouselItem key={index}>
+                        <Card>
+                          <CardContent className="flex flex-col items-center justify-center p-6">
+                            <motion.div
+                              initial={{ scale: 0.8, opacity: 0 }}
+                              animate={{ scale: 1, opacity: 1 }}
+                              transition={{ duration: 0.5 }}
+                            >
+                              <Badge className="mb-4 text-lg px-3 py-1">{breed.name}</Badge>
+                              <p className="text-center">{breed.description}</p>
+                            </motion.div>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious />
+                  <CarouselNext />
+                </Carousel>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
         
-        <div className="text-center relative">
-          <Button 
-            variant="outline" 
-            size="lg" 
-            onClick={handleLike}
-            className="group"
+        <div className="text-center relative mb-16">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
-            <Heart className="mr-2 h-6 w-6 text-pink-600 group-hover:text-pink-700 transition-colors" />
-            Like this page ({likeCount})
-          </Button>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              onClick={handleLike}
+              className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white border-none text-lg px-8 py-6"
+            >
+              <Heart className="mr-3 h-6 w-6 text-white group-hover:text-red-200 transition-colors" />
+              Show Your Cat Love ({likeCount})
+            </Button>
+          </motion.div>
           <AnimatePresence>
             {showAlert && (
               <motion.div
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -50 }}
-                className="absolute left-1/2 transform -translate-x-1/2 mt-4"
+                className="absolute left-1/2 transform -translate-x-1/2 mt-8"
               >
-                <Alert>
-                  <Star className="h-4 w-4" />
-                  <AlertTitle>Thank you!</AlertTitle>
-                  <AlertDescription>
-                    Your love for cats is appreciated!
+                <Alert className="bg-gradient-to-r from-yellow-400 to-orange-500 border-none text-white">
+                  <Star className="h-5 w-5 text-yellow-200" />
+                  <AlertTitle className="text-xl font-bold">Meow-velous!</AlertTitle>
+                  <AlertDescription className="text-lg">
+                    Your love for cats is paw-sitively appreciated!
                   </AlertDescription>
                 </Alert>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5 }}
+          className="text-center"
+        >
+          <h2 className="text-3xl font-bold mb-4 text-purple-700">Want to Learn More?</h2>
+          <p className="text-xl mb-6">Dive deeper into the world of cats and discover more fascinating facts!</p>
+          <Button className="bg-pink-500 hover:bg-pink-600 text-white text-lg px-8 py-3">
+            Explore More <ArrowRight className="ml-2" />
+          </Button>
+        </motion.div>
       </main>
     </div>
   );
