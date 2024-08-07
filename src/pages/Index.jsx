@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Cat, Heart, Info, Paw, Star, ArrowRight } from "lucide-react";
+import { Cat, Heart, Info, Paw, Star, ArrowRight, Fish } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/components/ui/use-toast";
 
 const catFacts = [
   "Cats sleep for about 70% of their lives.",
@@ -28,10 +30,21 @@ const catBreeds = [
 ];
 
 const Index = () => {
+  const { toast } = useToast();
   const [likeCount, setLikeCount] = useState(0);
   const [currentFactIndex, setCurrentFactIndex] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [catHappiness, setCatHappiness] = useState(50);
+  const headerRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: headerRef,
+    offset: ["start start", "end start"]
+  });
+
+  const headerOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
+  const headerScale = useTransform(scrollYProgress, [0, 1], [1, 0.8]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -45,13 +58,32 @@ const Index = () => {
 
   const handleLike = () => {
     setLikeCount((prev) => prev + 1);
+    setCatHappiness((prev) => Math.min(prev + 10, 100));
     setShowAlert(true);
     setTimeout(() => setShowAlert(false), 2000);
+    toast({
+      title: "Meow-velous!",
+      description: "Your love for cats is paw-sitively appreciated!",
+      duration: 3000,
+    });
+  };
+
+  const feedCat = () => {
+    setCatHappiness((prev) => Math.min(prev + 5, 100));
+    toast({
+      title: "Yum!",
+      description: "The cat enjoyed the treat!",
+      duration: 2000,
+    });
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-100 to-pink-100">
-      <header className="bg-purple-600 text-white py-20 px-8 relative overflow-hidden">
+      <motion.header 
+        ref={headerRef}
+        className="bg-purple-600 text-white py-20 px-8 relative overflow-hidden"
+        style={{ opacity: headerOpacity, scale: headerScale }}
+      >
         <div className="max-w-6xl mx-auto text-center relative z-10">
           <motion.h1 
             className="text-7xl font-bold mb-6"
@@ -133,7 +165,23 @@ const Index = () => {
             </AnimatePresence>
           </motion.div>
         </motion.div>
-        
+      
+        <motion.div 
+          className="bg-white rounded-lg p-6 shadow-lg mb-8"
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+        >
+          <h3 className="text-2xl font-bold mb-4 text-purple-700">Cat Happiness Meter</h3>
+          <Progress value={catHappiness} className="h-4 mb-2" />
+          <p className="text-lg">{catHappiness}% Happy</p>
+          <div className="flex justify-center mt-4">
+            <Button onClick={feedCat} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+              <Fish className="mr-2 h-5 w-5" /> Feed the Cat
+            </Button>
+          </div>
+        </motion.div>
+      
         <Tabs defaultValue="characteristics" className="mb-16">
           <TabsList className="grid w-full grid-cols-2 mb-8">
             <TabsTrigger value="characteristics" className="text-lg py-3">Characteristics</TabsTrigger>
@@ -224,24 +272,6 @@ const Index = () => {
               Show Your Cat Love ({likeCount})
             </Button>
           </motion.div>
-          <AnimatePresence>
-            {showAlert && (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                className="absolute left-1/2 transform -translate-x-1/2 mt-8"
-              >
-                <Alert className="bg-gradient-to-r from-yellow-400 to-orange-500 border-none text-white">
-                  <Star className="h-5 w-5 text-yellow-200" />
-                  <AlertTitle className="text-xl font-bold">Meow-velous!</AlertTitle>
-                  <AlertDescription className="text-lg">
-                    Your love for cats is paw-sitively appreciated!
-                  </AlertDescription>
-                </Alert>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
 
         <motion.div
@@ -257,6 +287,23 @@ const Index = () => {
           </Button>
         </motion.div>
       </main>
+
+      <footer className="bg-purple-800 text-white py-12 px-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <h3 className="text-2xl font-bold mb-4">Stay Connected with the Feline World</h3>
+          <p className="mb-6">Sign up for our newsletter to receive weekly cat facts and adorable photos!</p>
+          <div className="flex justify-center">
+            <input 
+              type="email" 
+              placeholder="Enter your email" 
+              className="px-4 py-2 rounded-l-lg focus:outline-none text-purple-800"
+            />
+            <Button className="bg-pink-500 hover:bg-pink-600 rounded-l-none">
+              Subscribe
+            </Button>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
